@@ -28,76 +28,13 @@
 #include <utility>
 #include <vector>
 
+#include "font/font_types.h"
 #include "image.h"
 #include "math_base.h"
 
 namespace fheroes2
 {
     enum class SupportedLanguage : uint8_t;
-
-    enum class FontSize : uint8_t
-    {
-        SMALL,
-        NORMAL,
-        LARGE,
-        // These are special fonts designed only for buttons. Use WHITE font color for Good Interface and GRAY for Evil Interface.
-        BUTTON_RELEASED,
-        BUTTON_PRESSED,
-    };
-
-    enum class FontColor : uint8_t
-    {
-        WHITE,
-        GRAY,
-        YELLOW,
-        GOLDEN_GRADIENT,
-        SILVER_GRADIENT,
-    };
-
-    struct FontType
-    {
-        FontType() = default;
-
-        FontType( const FontSize size_, const FontColor color_ )
-            : size( size_ )
-            , color( color_ )
-        {
-            // Do nothing.
-        }
-
-        FontSize size = FontSize::NORMAL;
-        FontColor color = FontColor::WHITE;
-
-        static FontType normalWhite()
-        {
-            return { FontSize::NORMAL, FontColor::WHITE };
-        }
-
-        static FontType normalYellow()
-        {
-            return { FontSize::NORMAL, FontColor::YELLOW };
-        }
-
-        static FontType smallWhite()
-        {
-            return { FontSize::SMALL, FontColor::WHITE };
-        }
-
-        static FontType smallYellow()
-        {
-            return { FontSize::SMALL, FontColor::YELLOW };
-        }
-
-        static FontType largeWhite()
-        {
-            return { FontSize::LARGE, FontColor::WHITE };
-        }
-
-        static FontType buttonReleasedWhite()
-        {
-            return { FontSize::BUTTON_RELEASED, FontColor::WHITE };
-        }
-    };
 
     struct TextLineInfo
     {
