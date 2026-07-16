@@ -28,8 +28,7 @@
 #include <memory>
 #include <numeric>
 
-#include "game_assets.h"
-#include "icn.h"
+#include "font/font_manager.h"
 #include "ui_language.h"
 
 namespace
@@ -52,111 +51,6 @@ namespace
     bool isSpaceChar( const uint8_t character )
     {
         return ( character == ' ' );
-    }
-
-    const fheroes2::Sprite errorImage;
-
-    const fheroes2::Sprite & getChar( const uint8_t character, const fheroes2::FontType & fontType )
-    {
-        switch ( fontType.size ) {
-        case fheroes2::FontSize::SMALL:
-            switch ( fontType.color ) {
-            case fheroes2::FontColor::WHITE:
-                return Assets::getImage( ICN::SMALFONT, character );
-            case fheroes2::FontColor::GRAY:
-                return Assets::getImage( ICN::GRAY_SMALL_FONT, character );
-            case fheroes2::FontColor::YELLOW:
-                return Assets::getImage( ICN::YELLOW_SMALLFONT, character );
-            default:
-                // Did you add a new font color? Add the corresponding logic for it!
-                assert( 0 );
-                break;
-            }
-            break;
-        case fheroes2::FontSize::NORMAL:
-            switch ( fontType.color ) {
-            case fheroes2::FontColor::WHITE:
-                return Assets::getImage( ICN::FONT, character );
-            case fheroes2::FontColor::GRAY:
-                return Assets::getImage( ICN::GRAY_FONT, character );
-            case fheroes2::FontColor::YELLOW:
-                return Assets::getImage( ICN::YELLOW_FONT, character );
-            case fheroes2::FontColor::GOLDEN_GRADIENT:
-                return Assets::getImage( ICN::GOLDEN_GRADIENT_FONT, character );
-            case fheroes2::FontColor::SILVER_GRADIENT:
-                return Assets::getImage( ICN::SILVER_GRADIENT_FONT, character );
-            default:
-                // Did you add a new font color? Add the corresponding logic for it!
-                assert( 0 );
-                break;
-            }
-            break;
-        case fheroes2::FontSize::LARGE:
-            switch ( fontType.color ) {
-            case fheroes2::FontColor::WHITE:
-                return Assets::getImage( ICN::WHITE_LARGE_FONT, character );
-            case fheroes2::FontColor::GOLDEN_GRADIENT:
-                return Assets::getImage( ICN::GOLDEN_GRADIENT_LARGE_FONT, character );
-            case fheroes2::FontColor::SILVER_GRADIENT:
-                return Assets::getImage( ICN::SILVER_GRADIENT_LARGE_FONT, character );
-            default:
-                // Did you add a new font color? Add the corresponding logic for it!
-                assert( 0 );
-                break;
-            }
-            break;
-        case fheroes2::FontSize::BUTTON_RELEASED:
-            switch ( fontType.color ) {
-            case fheroes2::FontColor::WHITE:
-                return Assets::getImage( ICN::BUTTON_GOOD_FONT_RELEASED, character );
-            case fheroes2::FontColor::GRAY:
-                return Assets::getImage( ICN::BUTTON_EVIL_FONT_RELEASED, character );
-            default:
-                // Did you add a new font color? Add the corresponding logic for it!
-                assert( 0 );
-                break;
-            }
-            break;
-        case fheroes2::FontSize::BUTTON_PRESSED:
-            switch ( fontType.color ) {
-            case fheroes2::FontColor::WHITE:
-                return Assets::getImage( ICN::BUTTON_GOOD_FONT_PRESSED, character );
-            case fheroes2::FontColor::GRAY:
-                return Assets::getImage( ICN::BUTTON_EVIL_FONT_PRESSED, character );
-            default:
-                // Did you add a new font color? Add the corresponding logic for it!
-                assert( 0 );
-                break;
-            }
-            break;
-        default:
-            // Did you add a new font size? Add the corresponding logic for it!
-            assert( 0 );
-            break;
-        }
-
-        assert( 0 ); // Did you add a new font size? Please add implementation.
-
-        return errorImage;
-    }
-
-    uint32_t getCharacterLimit( const fheroes2::FontSize fontSize )
-    {
-        switch ( fontSize ) {
-        case fheroes2::FontSize::SMALL:
-            return Assets::getImageCount( ICN::SMALFONT );
-        case fheroes2::FontSize::NORMAL:
-        case fheroes2::FontSize::LARGE:
-            return Assets::getImageCount( ICN::FONT );
-        case fheroes2::FontSize::BUTTON_RELEASED:
-        case fheroes2::FontSize::BUTTON_PRESSED:
-            return Assets::getImageCount( ICN::BUTTON_GOOD_FONT_RELEASED );
-        default:
-            // Did you add a new font size? Please add implementation.
-            assert( 0 );
-        }
-
-        return 0;
     }
 
     int32_t getLineWidth( const uint8_t * data, const int32_t size, const fheroes2::FontCharHandler & charHandler, const bool keepTrailingSpaces )
@@ -325,22 +219,7 @@ namespace fheroes2
 {
     int32_t getFontHeight( const FontSize fontSize )
     {
-        switch ( fontSize ) {
-        case FontSize::SMALL:
-            return 8 + 2 + 1;
-        case FontSize::NORMAL:
-            return 13 + 3 + 1;
-        case FontSize::LARGE:
-            return 26 + 6 + 1;
-        case FontSize::BUTTON_RELEASED:
-        case FontSize::BUTTON_PRESSED:
-            return 15;
-        default:
-            assert( 0 ); // Did you add a new font size? Please add implementation.
-            break;
-        }
-
-        return 0;
+        return FontManager::instance().getLineHeight( fontSize );
     }
 
     TextBase::~TextBase() = default;
@@ -1332,7 +1211,7 @@ namespace fheroes2
 
     FontCharHandler::FontCharHandler( const FontType fontType )
         : _fontType( fontType )
-        , _charLimit( getCharacterLimit( fontType.size ) )
+        , _charLimit( FontManager::instance().getCharacterLimit( fontType.size ) )
         , _spaceCharWidth( _getSpaceCharWidth() )
     {
         // Do nothing.
@@ -1346,7 +1225,7 @@ namespace fheroes2
     const Sprite & FontCharHandler::getSprite( const uint8_t character ) const
     {
         // Display '?' in place of the invalid character.
-        return getChar( _isValid( character ) ? character : invalidChar, _fontType );
+        return FontManager::instance().getCharSprite( _isValid( character ) ? character : invalidChar, _fontType );
     }
 
     int32_t FontCharHandler::getWidth( const uint8_t character ) const
@@ -1377,22 +1256,7 @@ namespace fheroes2
 
     int32_t FontCharHandler::_getSpaceCharWidth() const
     {
-        switch ( _fontType.size ) {
-        case FontSize::SMALL:
-            return 4;
-        case FontSize::NORMAL:
-            return 6;
-        case FontSize::LARGE:
-        case FontSize::BUTTON_RELEASED:
-        case FontSize::BUTTON_PRESSED:
-            return 8;
-        default:
-            // Did you add a new font size? Please add implementation.
-            assert( 0 );
-            break;
-        }
-
-        return 0;
+        return FontManager::instance().getSpaceWidth( _fontType.size );
     }
 
     bool isFontAvailable( const std::string_view text, const FontType fontType )

@@ -30,6 +30,7 @@
 #include <utility>
 
 #include "agg.h"
+#include "font/font_manager.h"
 #include "game_assets.h"
 #include "icn.h"
 #include "settings.h"
@@ -291,23 +292,7 @@ namespace fheroes2
     void updateAlphabet( const std::string & abbreviation )
     {
         const SupportedLanguage language = getLanguageFromAbbreviation( abbreviation );
-        const SupportedLanguage resourceLanguage = getResourceLanguage();
-
-        // The original French assets replaces several ASCII special characters with language-specific characters.
-        // In the engine we use CP1252 for these characters.
-        if ( ( language == SupportedLanguage::English ) && ( resourceLanguage == SupportedLanguage::French ) ) {
-            // Force generate CP1252 alphabet when English language is selected for French assets.
-            Assets::updateLanguageDependentResources( SupportedLanguage::French, false );
-        }
-        else {
-            // To generate CP1252 alphabet for French assets we must assume that these assets are not original.
-            // Also we force generation of Cyrillic symbols for Russian assets - it is done for consistency of fonts with different assets.
-            const bool isOriginalResourceLanguage
-                = ( language == SupportedLanguage::English )
-                  || ( language == resourceLanguage && resourceLanguage != SupportedLanguage::French && resourceLanguage != SupportedLanguage::Russian );
-
-            Assets::updateLanguageDependentResources( language, isOriginalResourceLanguage );
-        }
+        FontManager::instance().switchLanguage( language );
     }
 
     SupportedLanguage getCurrentLanguage()
