@@ -1,0 +1,17 @@
+name: Dev Push
+
+on:
+  push:
+    branches: [ dev ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  msvc:
+    name: MSVC
+    uses: ./.github/workflows/msvc.yml
