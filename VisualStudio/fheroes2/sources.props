@@ -369,6 +369,9 @@
     <ClInclude Include="src\fheroes2\game\game_video.h" />
     <ClInclude Include="src\fheroes2\game\game_video_type.h" />
     <ClInclude Include="src\fheroes2\game\highscores.h" />
+    <ClInclude Include="src\fheroes2\gui\font\font_bitmap.h" />
+    <ClInclude Include="src\fheroes2\gui\font\font_manager.h" />
+    <ClInclude Include="src\fheroes2\gui\font\font_types.h" />
     <ClInclude Include="src\fheroes2\gui\cursor.h" />
     <ClInclude Include="src\fheroes2\gui\interface_base.h" />
     <ClInclude Include="src\fheroes2\gui\interface_border.h" />
